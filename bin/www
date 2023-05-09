@@ -9,6 +9,7 @@ var debug = require('debug')('pararius-tracking-dashboard:server');
 var http = require('http');
 
 const config = require("../config");
+const {createTunnel, createTunnelV2} = require("../utils/tunnel");
 
 /**
  * Get port from environment and store in Express.
@@ -31,6 +32,13 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+if (config.ngrokToken) {
+  createTunnel(port, config.ngrokToken)
+}
+
+if (config.tunnelName) {
+  createTunnelV2(port, config.tunnelName)
+}
 /**
  * Normalize a port into a number, string, or false.
  */

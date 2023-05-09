@@ -116,6 +116,7 @@ iframe {
   justify-content: center;
   flex-wrap: wrap;
   /* padding: 33px 30px; */
+  padding-bottom: 50px;
 }
 
 .wrap-table {
@@ -232,49 +233,63 @@ iframe {
 }
 
 .row .cell:nth-child(1) {
-  width: 22%;
+  width: 10%;
   /*360px;*/
   padding-left: 30px;
 }
 
 .row .cell:nth-child(2) {
-  width: 8%;
-  /*160px;*/
+  width: 22%;
+  /*360px;*/
+  padding-left: 5px;
 }
 
 .row .cell:nth-child(3) {
-  width: 8%;
-  /*250px;*/
+  width: 6%;
+  /*160px;*/
+  padding-left: 5px;
 }
 
 .row .cell:nth-child(4) {
-  width: 8%;
-  /*190px;*/
+  width: 6%;
+  /*250px;*/
+  padding-left: 5px;
 }
 
 .row .cell:nth-child(5) {
-  width: 8%;
-  /*360px;*/
+  width: 6%;
+  /*190px;*/
+  padding-left: 5px;
 }
 
 .row .cell:nth-child(6) {
-  width: 15%;
-  /*160px;*/
+  width: 9%;
+  /*360px;*/
+  padding-left: 5px;
 }
 
 .row .cell:nth-child(7) {
-  width: 8%;
-  /*250px;*/
+  width: 15%;
+  /*160px;*/
+  padding-left: 5px;
 }
 
 .row .cell:nth-child(8) {
   width: 8%;
-  /*190px;*/
+  /*250px;*/
+  padding-left: 5px;
 }
 
 .row .cell:nth-child(9) {
+  width: 8%;
+  /*190px;*/
+  padding-left: 5px;
+}
+
+.row .cell:nth-child(10) {
   width: 15%;
   /*250px;*/
+  padding-left: 5px;
 }
 
 .header_image {
@@ -347,7 +362,7 @@ iframe {
   background-color: #fefefe;
   margin: 15% auto;
   /* 15% from the top and centered */
-  padding: 5px;
+  padding: 15px;
   border: 1px solid #888;
   width: 40%;
   /* Could be more or less, depending on screen size */

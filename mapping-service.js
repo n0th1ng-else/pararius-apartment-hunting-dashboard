@@ -38,7 +38,7 @@ module.exports = class DistanceService extends EventEmitter {
                     }
                 })
             }
-        }).catch(console.log)
+        }).catch(console.error)
     }
 
     doDistanceRequest(originsQuery, queryString) {
@@ -54,12 +54,12 @@ module.exports = class DistanceService extends EventEmitter {
                             id: originsQuery[j].id,
                             distance: distance,
                             duration: duration,
-                            navigation: `https://www.google.com/maps/dir/${originsQuery[j].zipCode.replace(" ","+")}+Netherlands/${this.destination.replace(" ","+")}+Netherlands`
+                            navigation: `https://www.google.com/maps/dir/${originsQuery[j].zipCode.replaceAll(" ","+")}+Netherlands/${this.destination.replaceAll(" ","+")}+Netherlands`
                         })
                     }
                 }
             }
-        }).catch(console.log)
+        }).catch(console.error)
     }
 
     getDistances(properties) {

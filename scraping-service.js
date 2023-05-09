@@ -1,17 +1,23 @@
 'use strict';
 
 const EventEmitter = require("events");
-
-const axios = require("axios");
+const puppeteer = require('puppeteer');
 const cheerio = require("cheerio");
 const throttledQueue = require('throttled-queue');
 
 const config = require("./config");
+const {fetchPicture, fetchAptUrl, fetchAptPath, fetchAptAgent, fetchSurface, fetchRooms,
+  fetchInterior, fetchStatus, fetchAptName, fetchAptPrice, fetchAptAddress, getId
+} = require("./utils/scrap");
+const {LIST_HEADER} = require("./utils/selectors");
+const {getLocationUrl} = require("./utils/map");
+const {getTimestamp} = require("./utils/time");
 
 const throttle = throttledQueue(config.parariusMaxRequestPerSecond, 1000);
 
 const URL_REGEX = /^(https:\/\/)(www.)?(pararius.com\/apartments)(\/(?!page)[a-zA-z0-9\-]+)+(\/page\-\d{0,2})?(\/?)/;
 const MAX_RESULT = config.maxScrapingResults;
+const CAPTCHA_TIMEOUT = 5 * 60 * 1000;
 
 module.exports = class ScrapingService extends EventEmitter {
 
@@ -45,14 +51,25 @@ module.exports = class ScrapingService extends EventEmitter {
   _fetchWebsite(pageNumber) {
     let self = this;
     var promise = new Promise(function (resolve, reject) {
+      let br;
       throttle(() => {
-        axios.get(self.url + pageNumber).then(function (result) {
-            resolve(cheerio.load(result.data));
-          })
-          .catch(function (error) {
-            reject(error);
-          })
-      });
+        puppeteer.launch({ headless: false, protocolTimeout: CAPTCHA_TIMEOUT })
+            .then(browser => {
+              br = browser;
+              return browser.newPage()
+            })
+            .then(page => {
+              return page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36')
+                  .then(() => page.goto(self.url + pageNumber, { waitUntil: 'networkidle0'}))
+                  .then(() => page.waitForSelector(LIST_HEADER, {timeout: CAPTCHA_TIMEOUT}))
+                  .then(() => page.content())
+                  .then(data => {
+                    resolve(cheerio.load(data));
+                  })
+                  .finally(() => br.close())
+            })
+            .catch(err => reject(err))
+      })
     });
     return promise;
   }
@@ -76,14 +93,14 @@ module.exports = class ScrapingService extends EventEmitter {
           self._fetchWebsite(i).then(($) => {
             unProcessedPages--;
             self._scrap($)
-            if (unProcessedPages == 0 && self.isWorking) {
+            if (unProcessedPages === 0 && self.isWorking) {
               self.isWorking = false;
               self.emit("end")
             }
           }).catch((error) => {
             unProcessedPages--;
             self.emit("error", error)
-            if (unProcessedPages == 0 && self.isWorking) {
+            if (unProcessedPages === 0 && self.isWorking) {
               self.isWorking = false;
               self.emit("end")
             }
@@ -112,39 +129,42 @@ module.exports = class ScrapingService extends EventEmitter {
   }
 
   _scrap($) {
-    let self = this;
-    $("ul.search-results-list li.property-list-item-container").each((_, element) => {
-      let id = $(element).attr("data-property-id")
-      let price = parseInt($("p.price", element).clone().children().remove().end().text().replace(/[€,]+/g, '').trim())
-      let name = $("div.details > h2 > a", element).text().replace(/\s\s+/g, ' ').trim()
-      let url = "https://www.pararius.com" + $("div.details > h2 > a", element).attr("href").trim()
-      let zipCode = $("ul.breadcrumbs > li:nth-child(1)", element).text().trim()
-      let city = $("ul.breadcrumbs > li:nth-child(2)", element).text().trim()
-      let neighborhood = $("ul.breadcrumbs > li:nth-child(3)", element).text().trim()
-      let estateAgentName = $("p.estate-agent a", element).text().replace(/\s\s+/g, ' ').trim()
-      let estateAgentLink = $("p.estate-agent a", element).attr("href").trim()
-      let surfaceArea = parseInt($("ul.property-features > li.surface", element).text().trim())
-      let bedrooms = parseInt($("ul.property-features > li.bedrooms", element).text().trim())
-      let furniture = $("ul.property-features > li.furniture", element).text().trim()
-      let availability = $("ul.property-features > li.date", element).text().trim()
-      let locationUrl = `https://www.google.com/maps/place/${zipCode.replace(" ","+")}+${city}`
-      self.emit("property", {
-        id: id,
-        price: price,
-        name: name,
-        url: url,
-        zipCode: zipCode,
-        city: city,
-        neighborhood: neighborhood,
-        agentName: estateAgentName,
-        agentUrl: estateAgentLink,
-        surfaceArea: surfaceArea,
-        bedrooms: bedrooms,
-        furniture: furniture,
-        availability: availability,
-        discoveryDate: new Date().toLocaleDateString('en-NL'),
-        locationUrl: locationUrl
-      })
+    const self = this;
+    $("ul.search-list li.search-list__item--listing").each((_, element) => {
+      const picture = fetchPicture($, element);
+      const id = getId(fetchAptPath($, element));
+      const price = fetchAptPrice($, element)
+      const name = fetchAptName($, element);
+      const url = fetchAptUrl($, element);
+      const {zipCode, city, neighborhood} = fetchAptAddress($, element);
+      const {name: agentName, link: agentUrl} = fetchAptAgent($, element)
+      const surfaceArea = fetchSurface($, element);
+      const bedrooms = fetchRooms($, element);
+      const furniture = fetchInterior($, element);
+      const availability = fetchStatus($, element);
+      const discoveryDate =  getTimestamp();
+      const locationUrl = getLocationUrl(zipCode, city);
+
+      const property = {
+        id,
+        price,
+        name,
+        url,
+        zipCode,
+        city,
+        neighborhood,
+        picture,
+        agentName,
+        agentUrl,
+        surfaceArea,
+        bedrooms,
+        furniture,
+        availability,
+        discoveryDate,
+        locationUrl,
+      }
+
+      self.emit("property", property)
     });
   }
 }

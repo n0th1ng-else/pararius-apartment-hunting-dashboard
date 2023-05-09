@@ -63,4 +63,21 @@ router.get("/map(/(|new|interesting|shortlisted|hidden|all|not_available))?(/pag
   });
 });
 
+router.get('/submit', (req, res) => {
+  res.render("new", {
+    url: "",
+    title: "",
+    price: "",
+    zip: "",
+    city: "",
+    size: "",
+    furniture: "",
+    picture: "",
+    bedrooms: "",
+    neighborhood: "",
+    aname: "",
+    aurl: ""
+  })
+})
+
 module.exports = router;

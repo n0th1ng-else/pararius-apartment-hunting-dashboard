@@ -4,7 +4,7 @@
     function moveTo(button, value) {
         let id = button.getAttribute("value")
         $.ajax({
-            url: `http://localhost:8080/properties/${id}`,
+            url: `/properties/${id}`,
             type: 'PUT',
             data: {
                 state: value
@@ -18,7 +18,7 @@
     function moveToHidden(button) {
         let id = button.getAttribute("value")
         $.ajax({
-            url: `http://localhost:8080/properties/${id}`,
+            url: `/properties/${id}`,
             type: 'DELETE',
             success: function () {
                 changeRowState(button);
@@ -41,7 +41,7 @@
         $("#modal-check").data("id", "");
         $("#notesModal").css("display", "none");
         $.ajax({
-            url: `http://localhost:8080/properties/${id}`,
+            url: `/properties/${id}`,
             type: 'PUT',
             data: {
                 notes: notes
@@ -81,7 +81,7 @@
         const pageNum = $("body").data("current-page")
         const state = $("body").data("current-state")
         $.ajax({
-            url: `http://localhost:8080/properties/${state}/page-${pageNum}`,
+            url: `/properties/${state}/page-${pageNum}`,
             type: 'GET',
             success: function (results) {
 

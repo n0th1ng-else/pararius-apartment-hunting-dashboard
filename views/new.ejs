@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Pararius Tracking Dashboard</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="/images/icons/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+
+	<base href="/">
+
+	<style>
+        .sc-centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sc-form {
+            width: 640px;
+            padding: 16px;
+        }
+
+        .sc-form input {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .sc-form p {
+            margin: 16px 0;
+        }
+
+        .sc-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+        }
+
+        .sc-action {
+            padding: 0.5rem 1rem;
+            background-color: #36304a;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.25rem;
+        }
+
+        .sc-alert {
+            border: 1px solid red;
+            padding: 1rem;
+            background-color: white;
+            margin: 0.5rem;
+            color: red;
+        }
+	</style>
+</head>
+
+<body>
+    <header class="sc-centered">
+        <a href="/">
+            <img class="header_image" src="/images/icons/pararius.png" alt="" />
+        </a>
+    </header>
+    <article class="sc-centered">
+        <h1>Add the apartment to the list</h1>
+        <% if(locals.errorMessage){ %>
+        <aside class="sc-alert">
+            <h2><%= errorMessage %></h2>
+        </aside>
+        <% } %>
+        <form method="POST" action="/properties/apartment" class="sc-form" autocomplete="off">
+            <input autocomplete="false" name="hidden" type="text" style="display:none;">
+            <p>
+                <label for="url">Listing url</label>
+                <input
+                    id="url"
+                    name="url"
+                    required
+                    placeholder="https://www.pararius.com/house-for-rent/amsterdam/8fe96245/piet-wiedijkstraat"
+                    value="<%= url %>" />
+            </p>
+            <p>
+                <label for="title">Title</label>
+                <input
+                    id="title"
+                    name="title"
+                    required
+                    placeholder="House Piet Wiedijkstraat"
+                    value="<%= title %>" />
+            </p>
+            <p>
+                <label for="price">Price</label>
+                <input
+                    id="price"
+                    name="price"
+                    required
+                    placeholder="1500"
+                    value="<%= price %>" />
+            </p>
+            <p>
+                <label for="zip">Zip code</label>
+                <input
+                    id="zip"
+                    name="zip"
+                    required
+                    placeholder="1068 NW"
+                    value="<%= zip %>" />
+            </p>
+            <p>
+                <label for="city">City</label>
+                <input
+                    id="city"
+                        name="city"
+                        required
+                        placeholder="Amsterdam"
+                        value="<%= city %>" />
+            </p>
+            <p>
+                <label for="size">Size of the apartment (sqm)</label>
+                <input
+                    id="size"
+                    name="size"
+                    required
+                    placeholder="65"
+                    value="<%= size %>" />
+            </p>
+            <p>
+                <label for="furniture">Furniture</label>
+                <input
+                    id="furniture"
+                    name="furniture"
+                    required
+                    placeholder="Furnished"
+                    value="<%= furniture %>" />
+            </p>
+            <p>
+                <label for="picture">Picture url (Optional)</label>
+                <input
+                    id="picture"
+                    name="picture"
+                    placeholder="https://casco-media-prod.global.ssl.fastly.net/8fe96245-2436-5076-915c-38fee4ce3328/67424df4052502909c6210341be06850.jpg"
+                    value="<%= picture %>" />
+            </p>
+            <p>
+                <label for="bedrooms">Bedrooms (Optional)</label>
+                <input
+                    id="bedrooms"
+                    name="bedrooms"
+                    placeholder="2"
+                    value="<%= bedrooms %>" />
+            </p>
+            <p>
+                <label for="neighborhood">Neighborhood (Optional)</label>
+                <input
+                    id="neighborhood"
+                    name="neighborhood"
+                    placeholder="Osdorp-Oost"
+                    value="<%= neighborhood %>" />
+            </p>
+            <p>
+                <label for="aname">Agent name (Optional)</label>
+                <input
+                    id="aname"
+                    name="aname"
+                    placeholder="HB Housing"
+                    value="<%= aname %>" />
+            </p>
+            <p>
+                <label for="aurl">Agent url (Optional)</label>
+                <input
+                    id="aurl"
+                    name="aurl"
+                    placeholder="https://www.pararius.com/real-estate-agents/amsterdam/hb-housing-amsterdam"
+                    value="<%= aurl %>" />
+            </p>
+            <div class="sc-actions">
+                <a class="sc-action" href="/">Back to the list</a>
+                <button class="sc-action" type="submit">Save</button>
+            </div>
+        </form>
+    </article>
+</body>
+
+</html>

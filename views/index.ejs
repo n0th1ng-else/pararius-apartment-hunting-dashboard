@@ -20,6 +20,7 @@
 	<!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="/stylesheets/util.css">
 	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheets/v2.css">
 	<!--===============================================================================================-->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -31,7 +32,9 @@
 
 <body data-current-state="<%= pagination.state%>">
 	<div class="center">
-		<img class="header_image" src="/images/icons/pararius.png" />
+        <a href="/">
+            <img class="header_image" src="/images/icons/pararius.png" alt="" />
+        </a>
 	</div>
 	<div class="limiter">
 		<div class="container-table">
@@ -74,6 +77,9 @@
 					<% } else { %>
 					<div class="row header">
 						<div class="cell">
+                            Preview
+                        </div>
+						<div class="cell">
 							Property
 						</div>
 						<div class="cell">
@@ -103,6 +109,9 @@
 					</div>
 					<% for (var i = 0; i < properties.length; i++) { %>
 					<div class="row" id="<%= properties[i].id %>">
+                        <div class="cell" data-title="Picture">
+                            <img class="sc-pic" src="<%= properties[i].picture %>" />
+                        </div>
 						<div class="cell" data-title="Property">
 							<a target="_blank" href="<%= properties[i].url %>">
 								<%= properties[i].name %>
@@ -129,12 +138,12 @@
 							<%= properties[i].neighborhood %>
 						</div>
 						<div class="cell" data-title="Distance">
-							<a target="_blank" href="<%= properties[i].locationUrl %>">
+							<a target="_blank" href="<%= properties[i].locationUrl %>" title="Open the location">
 								<%= (properties[i].distance/1000).toFixed(1) %> Km
 							</a>
 						</div>
 						<div class="cell" data-title="Commute">
-							<a target="_blank" href="<%= properties[i].navigation %>">
+							<a target="_blank" href="<%= properties[i].navigation %>" title="Show route on google maps">
 								<%= Math.floor(properties[i].duration / 60) %>m
 							</a>
 						</div>
@@ -167,6 +176,9 @@
 					</div>
 					<% } %>
 					<% } %>
+				</div>
+				<div class="pagination" style="float: left;">
+				    <a href="/submit">Add manually</a>
 				</div>
 				<% if(pagination.pages>1){ %>
 				<div class="pagination" style="float: right;">

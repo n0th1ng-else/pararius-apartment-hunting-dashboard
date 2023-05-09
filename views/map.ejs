@@ -20,6 +20,7 @@
 	<!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="/stylesheets/util.css">
 	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheets/v2.css">
 	<!--===============================================================================================-->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -32,7 +33,9 @@
 
 <body data-current-state="<%= pagination.state%>" data-current-page="<%= pagination.page%>">
 	<div class="center">
-		<img class="header_image" src="/images/icons/pararius.png" />
+        <a href="/">
+            <img class="header_image" src="/images/icons/pararius.png" alt="" />
+        </a>
 	</div>
 	<div class="limiter">
 		<div class="container-table">
@@ -76,6 +79,9 @@
 					<div id="map"></div>
 					<% } %>
 				</div>
+                <div class="pagination" style="float: left;">
+                    <a href="/submit">Add manually</a>
+                </div>
 				<% if(pagination.pages>1){ %>
 				<div class="pagination" style="float: right;">
 					<% if(minPage>1){ %>

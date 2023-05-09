@@ -3,6 +3,13 @@ const geolib = require('geolib');
 const router = express.Router();
 const Db = require("../db");
 const config = require("../config");
+const {getId} = require("../utils/scrap");
+const {COLOR} = require("../utils/colors");
+const {getLocationUrl} = require("../utils/map");
+const {getTimestamp} = require("../utils/time");
+const DistanceService = require("../mapping-service");
+
+const distanceService = new DistanceService(config.commuteAddress, config.commuteMode, config.googleApi);
 
 const db = new Db();
 
@@ -111,6 +118,46 @@ router.delete("/:id", function (req, res) {
   }
 });
 
+router.post("/apartment", (req, res) => {
+  const payload = req.body;
+  const url = new URL(payload.url)
+  const id = getId(url.pathname);
+  const zipCode = payload.zip;
+  const city = payload.city;
 
+
+  if (db.hasProperty(id)) {
+    res.render("new", {
+      ...payload,
+      errorMessage: "The apartment is in the list already"
+    })
+    return;
+  }
+
+  const property = {
+    id,
+    price: Number(payload.price),
+    name: payload.title,
+    url,
+    zipCode: payload.zip,
+    city: payload.city,
+    neighborhood: payload.neighborhood || "",
+    picture: payload.picture || "",
+    agentName: payload.aname || "",
+    agentUrl: payload.aurl || "",
+    surfaceArea: Number(payload.size),
+    bedrooms: payload.bedrooms ? Number(payload.bedrooms) : 1,
+    furniture: payload.furniture,
+    availability: "",
+    discoveryDate: getTimestamp(),
+    locationUrl: getLocationUrl(zipCode, city),
+  }
+  console.log(`${COLOR.Dim} Got property: ${property.name} ${property.id} ${COLOR.Reset}`)
+  db.addProperty(property)
+  distanceService.getDistances(db.getPropertiesWithoutDistance())
+  distanceService.getCoordinates(db.getPropertiesWithoutCoordinates());
+
+  res.redirect("/")
+})
 
 module.exports = router;

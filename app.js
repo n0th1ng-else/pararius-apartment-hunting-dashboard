@@ -8,6 +8,7 @@ const DistanceService = require("./mapping-service");
 const Db = require("./db");
 
 const config = require("./config");
+const {getCurrentTime} = require("./utils/time");
 
 const indexRouter = require('./routes/index');
 const propertiesRouter = require('./routes/properties');
@@ -16,10 +17,11 @@ const app = express();
 
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const {COLOR} = require("./utils/colors");
 
-let scrapingService = new ScrapingService(config.url, config.updateFrequency);
-let db = new Db();
-let distanceService = new DistanceService(config.commuteAddress, config.commuteMode, config.googleApi);
+const scrapingService = new ScrapingService(config.url, config.updateFrequency);
+const db = new Db();
+const distanceService = new DistanceService(config.commuteAddress, config.commuteMode, config.googleApi);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -55,40 +57,41 @@ app.use(function (err, req, res, next) {
 });
 
 scrapingService.on("property", (property) => {
-  console.log("Got property: ", property.id, property.name)
+  console.log(`${COLOR.Dim} Got property: ${property.name} ${property.id} ${COLOR.Reset}`)
   db.addProperty(property)
 })
 
 distanceService.on("distance", (property) => {
-  console.log("Updating property distance: ", property.id)
+  console.log(`${COLOR.BgGray}${COLOR.FgBlack} Updating property distance: ${property.id} ${COLOR.Reset}`)
   db.updateProperty(property.id, property)
 })
 
 distanceService.on("coordinates", (property) => {
-  console.log("Updating property coordinates: ", property.id)
+  console.log(`${COLOR.BgGray}${COLOR.FgBlack} Updating property coordinates: ${property.id} ${COLOR.Reset}`)
   db.updateProperty(property.id, property)
 })
 
 scrapingService.on("start", () => {
-  console.log("Scraping started")
+  console.log(`${COLOR.FgYellow}[${getCurrentTime()}] Scraping started ${COLOR.Reset}`)
   distanceService.getDistances(db.getPropertiesWithoutDistance())
 })
 scrapingService.on("end", () => {
-  console.log("Scraping Ended")
+  console.log(`${COLOR.FgYellow}[${getCurrentTime()}] Scraping Ended ${COLOR.Reset}`)
   distanceService.getDistances(db.getPropertiesWithoutDistance())
   distanceService.getCoordinates(db.getPropertiesWithoutCoordinates());
 })
 scrapingService.on("error", (error) => {
-  console.log(error)
+  console.error(error)
 })
 
 db.on("added", (property) => {
-  console.log("Property added: ", property.id)
+  console.log(`${COLOR.BgGreen}${COLOR.Blink}${COLOR.FgBlack} Property added: ${property.id} ${COLOR.Reset}`)
 })
 
 db.on("updated", (property) => {
-  console.log("Property updated: ", property.id)
+  console.log(`${COLOR.BgGray}${COLOR.FgBlack} Property updated: ${property.id} ${COLOR.Reset}`)
 })
 
 scrapingService.start();
+
 module.exports = app;
